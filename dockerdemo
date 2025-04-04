@@ -26,5 +26,9 @@ Run hello.py file in python container
 use image :  python
 Note: use volume to keep hello.py file.
 file: echo "print("hello world")" > hello.py
+docker volume create pyvol
+cp hello.py <pyvol_dir>
+docker run -itd -v pyvol:/app -w /app python ./hello.py
+
 
 

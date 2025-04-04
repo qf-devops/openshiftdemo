@@ -3,6 +3,7 @@ Example:
 Create docker volume
 
 $docker volume create myvol
+$docker volume inspect myvol
 
 Create jenkins container with volume as a mount for jenkins homedir(/var/jenkins_home)
 
@@ -10,3 +11,19 @@ $docker run -itd -p 8080:8080 -v myvol:/var/jenkins_home --name=jen1 jenkins/jen
 
 Access jenkins URL:
  http://public_ipaddress:80
+
+
+command for stop the existing container
+
+command for deleting the container
+
+Delete IMAGE
+
+
+Assignment:
+Run hello.py file in python container
+use image :  python
+Note: use volume to keep hello.py file.
+file: echo "print("hello world")" > hello.py
+
+

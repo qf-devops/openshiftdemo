@@ -7,3 +7,6 @@ $docker volume create myvol
 Create jenkins container with volume as a mount for jenkins homedir(/var/jenkins_home)
 
 $docker run -itd -p 8080:8080 -v myvol:/var/jenkins_home - -name=jen1 jenkins/jenkins:lts 
+
+Access jenkins URL:
+ http://public_ipaddress:80

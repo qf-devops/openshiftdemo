@@ -11,13 +11,14 @@ $docker run -itd -p 8080:8080 -v myvol:/var/jenkins_home --name=jen1 jenkins/jen
 
 Access jenkins URL:
  http://public_ipaddress:80
-
+docker exec -it jen1 cat /var/jenkins_home/
 
 command for stop the existing container
-
+docker stop <containerid/name>
 command for deleting the container
-
+docker rm <c.id>
 Delete IMAGE
+docker rmi <imagename>
 
 
 Assignment:

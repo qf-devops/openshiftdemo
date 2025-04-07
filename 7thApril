@@ -6,3 +6,5 @@ Assignment:
   Create repo in ECR
   authenticate ece repo login
   push docker image inot ECR
+
+aws cli:;  https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html

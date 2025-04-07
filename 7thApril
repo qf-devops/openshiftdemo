@@ -1,6 +1,8 @@
 Assignment:
   clone repo into ec2 indstance
+    git clone https://github.com/qf-devops/docker.git
   run docker build command
-  create repo in ECR
+     dcoker build -t web .
+  Create repo in ECR
   authenticate ece repo login
   push docker image inot ECR

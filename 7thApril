@@ -12,3 +12,16 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 yum install unzip
 unzip awscliv2.zip
 sudo ./aws/install
+
+----------------------
+assignment-2
+
+run docker-compose command
+
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+docker-compose version
+
+docker-compose up -d

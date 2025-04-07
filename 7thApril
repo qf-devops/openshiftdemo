@@ -1,1 +1,6 @@
 Assignment:
+  clone repo into ec2 indstance
+  run docker build command
+  create repo in ECR
+  authenticate ece repo login
+  push docker image inot ECR

@@ -15,3 +15,10 @@ sudo mv /tmp/eksctl /usr/local/bin
 
 #setup:
 https://eksctl.io/usage/creating-and-managing-clusters/#
+
+
+run cluster setup command:
+eksctl create cluster -f cluster.yaml
+
+delete cluster:
+eksctl delete cluster -f cluster.yaml

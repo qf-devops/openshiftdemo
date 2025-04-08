@@ -1,0 +1,22 @@
+docker swarm example:
+
+Launch 2 ec2 instances
+install docker engine
+initialize the docker swarm manager
+use another ec2 as a worker using join command.
+check nodes were added to cluster.
+create a service
+deploy stack into the cluster.
+
+
+commands:
+docker swarm init
+docker swarm join-token worker
+docker node ls
+#docker swarm join --token SWMTKN-1-3xygc9r7kvtm1babld1ba18rk92cu3ltrgiymzqs4z7i6acfzj-atw1o9k3sgusnatyszqfokv9s 172.31.13.79:2377
+docker service create --name=s1 -p 80:80 nginx
+docker service ls
+docker service ps s1
+docker service scale s1=3
+docker stack deploy -c stack-dc.yml mystack
+docker stack services mystack

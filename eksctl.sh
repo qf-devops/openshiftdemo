@@ -12,13 +12,13 @@ curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_ch
 tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
 
 sudo mv /tmp/eksctl /usr/local/bin
+export PATH=$PATH:/usr/local/bin
+# #setup:
+# https://eksctl.io/usage/creating-and-managing-clusters/#
 
-#setup:
-https://eksctl.io/usage/creating-and-managing-clusters/#
 
+# run cluster setup command:
+# eksctl create cluster -f cluster.yaml
 
-run cluster setup command:
-eksctl create cluster -f cluster.yaml
-
-delete cluster:
-eksctl delete cluster -f cluster.yaml
+# delete cluster:
+# eksctl delete cluster -f cluster.yaml

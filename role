@@ -1,0 +1,36 @@
+✅ Step 1: Add IAM Permissions for EKS Access (Optional but recommended)
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "eks:DescribeCluster"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+
+
+✅ Step 2: Update the aws-auth ConfigMap
+kubectl edit configmap aws-auth -n kube-system
+To grant access to an IAM User:
+mapUsers: |
+  - userarn: arn:aws:iam::123456789012:user/other-user
+    username: other-user
+    groups:
+      - system:masters
+To grant access to an IAM Role:
+mapRoles: |
+  - rolearn: arn:aws:iam::123456789012:role/OtherEksAccessRole
+    username: eks-role-user
+    groups:
+      - system:masters
+
+✅ Step 3: Let the User Access the Cluster
+
+aws eks --region <region> update-kubeconfig --name <cluster-name>
+
+kubectl get nodes

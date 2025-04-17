@@ -1,0 +1,27 @@
+Deploy a Sample App using oc in Azure OpenShift
+1. Login to your OpenShift Cluster
+oc login <ARO_API_URL> --token=<your_token>
+Or use:
+oc login https://<ARO_CLUSTER_URL> --username=<your_username> --password=<your_password>
+
+2. Create a New Project (Namespace)
+oc new-project sample-app
+
+3. Deploy a Sample Application
+Let’s deploy a simple Node.js app using a public GitHub repo.
+oc new-app nodejs~https://github.com/sclorg/nodejs-ex -n sample-app
+Alternatively, for a Python app:
+oc new-app python~https://github.com/sclorg/django-ex -n sample-app
+
+4. Expose the Service (Create a Route)
+oc expose svc/nodejs-ex -n sample-app
+Check the route:
+oc get routes -n sample-app
+It will show a public URL like:
+NAME        HOST/PORT                                    PATH   SERVICES    PORT   TERMINATION   WILDCARD
+nodejs-ex   nodejs-ex-sample-app.apps.<cluster>.aroapp.io         nodejs-ex   8080                 None
+Visit that URL in your browser to see the app running.
+
+5. Check Deployment Status
+oc get pods -n sample-app
+oc logs <pod-name> -n sample-app

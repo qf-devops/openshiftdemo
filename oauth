@@ -1,0 +1,40 @@
+Steps:
+Create the htpasswd File: First, you need to generate an htpasswd file, which stores your users and their encrypted passwords.
+
+You can create the file using the htpasswd command. If you don’t have htpasswd installed, you can install it via apache2-utils or httpd-tools package on most Linux distributions.
+
+Run the following command to create the file and add a user:
+
+
+htpasswd -c /path/to/htpasswd_file username
+
+htpasswd -c /tmp/htpasswd_file myuser
+
+htpasswd /tmp/htpasswd_file anotheruser
+
+Upload to openshift:
+
+oc create secret generic htpasswd-secret --from-file=htpasswd=/path/to/htpasswd_file
+
+
+Configure the Identity Provider:
+
+oc edit OAuth
+
+
+apiVersion: oauth.openshift.io/v1
+kind: OAuth
+spec:
+  identityProviders:
+    - name: htpasswd-provider
+      challenge: true
+      login: true
+      mappingMethod: claim
+      htpasswd:
+        fileData:
+          name: htpasswd-secret
+        insecure: false
+
+
+oc login -u myuser -p mypassword
+

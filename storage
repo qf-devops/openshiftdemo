@@ -1,0 +1,84 @@
+
+Step 1: Create an Azure File Share
+# Set variables
+RESOURCE_GROUP=myResourceGroup
+STORAGE_ACCOUNT_NAME=mystorageaccount
+SHARE_NAME=myfileshare
+
+# Create storage account (if needed)
+az storage account create \
+  --name $STORAGE_ACCOUNT_NAME \
+  --resource-group $RESOURCE_GROUP \
+  --location eastus \
+  --sku Standard_LRS
+
+# Create file share
+az storage share create \
+  --name $SHARE_NAME \
+  --account-name $STORAGE_ACCOUNT_NAME
+
+
+Step 2: Get Storage Account Ke
+
+STORAGE_KEY=$(az storage account keys list \
+  --resource-group $RESOURCE_GROUP \
+  --account-name $STORAGE_ACCOUNT_NAME \
+  --query '[0].value' -o tsv)
+
+
+Step3: Create a Kubernetes Secret for Storage Access
+oc create secret generic azure-secret \
+  --from-literal=azurestorageaccountname=$STORAGE_ACCOUNT_NAME \
+  --from-literal=azurestorageaccountkey=$STORAGE_KEY
+
+Create a PersistentVolume (PV) and PersistentVolumeClaim (PVC)
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: azure-file-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: azurefile
+  azureFile:
+    secretName: azure-secret
+    shareName: myfileshare
+    readOnly: false
+    secretNamespace: default
+
+oc apply -f azure-file-pv.yaml
+oc apply -f azure-file-pvc.yaml
+
+
+Step 5: Use the PVC in Your Pod
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: azure-file-test
+spec:
+  containers:
+    - name: app
+      image: nginx
+      volumeMounts:
+        - name: azure
+          mountPath: /mnt/azure
+  volumes:
+    - name: azure
+      persistentVolumeClaim:
+        claimName: azure-file-pvc
+
+
+oc apply -f azure-file-pod.yaml
+
+
+Validate
+
+oc exec azure-file-test -- ls /mnt/azure
+
+

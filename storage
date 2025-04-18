@@ -50,6 +50,20 @@ spec:
     readOnly: false
     secretNamespace: default
 
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-file-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azurefile
+  resources:
+    requests:
+      storage: 5Gi
+
+
 oc apply -f azure-file-pv.yaml
 oc apply -f azure-file-pvc.yaml
 

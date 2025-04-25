@@ -1,0 +1,89 @@
+
+
+Common OpenShift Upgrade Issues
+
+1. Cluster Operators Stuck in Progressing/Degraded
+* Cause: Custom configurations or unsupported versions of CRDs/operators blocking upgrade.
+* Solution:
+    * Run oc get co and inspect any stuck operator with oc describe co <operator>.
+    * Check logs for operators: oc logs -n openshift-<component> deploy/<pod-name>
+    * Reconcile any changes you’ve made to the operator’s configuration.
+
+2. Node Upgrade Fails / Node Stuck in Draining
+* Cause: Pods with PodDisruptionBudget, misconfigured daemonsets, or non-evictable pods.
+* Solution:
+    * Check which pod is blocking the drain: oc adm drain <node> --dry-run
+    * Temporarily remove or relax PDBs, use --force only with caution.
+
+3. Machine Config Operator (MCO) Issues
+* Cause: Incompatible custom MachineConfigs or ignition templates.
+* Solution:
+    * Run: oc get mcp (MachineConfigPools)
+    * Check MCO logs: oc logs -n openshift-machine-config-operator <pod>
+    * Remove or fix problematic custom MachineConfigs (e.g., invalid file paths, incorrect permissions).
+
+4. Unsupported APIs or Deprecated Resources
+* Cause: Using deprecated APIs (like extensions/v1beta1) that were removed in newer versions.
+* Solution:
+    * Run oc get apirequestcounts to identify deprecated APIs being used.
+    * Refactor manifests or Helm charts to use the supported API versions.
+
+ 5. Custom Resources (CRs) Breaking Operator Lifecycle
+* Cause: Custom CRs may not conform to new schema/validation in upgraded operator versions.
+* Solution:
+    * Review CRDs and CRs before upgrade.
+    * Backup and validate with operator version compatibility guides.
+
+ 6. Upgrade Freezes During Pre-Checks
+* Cause: Cluster version operator (CVO) validations failing.
+* Solution:
+    * Run: oc adm upgrade
+    * Look at oc get clusterversion and oc describe clusterversion for validation errors.
+    * Fix issues like invalid image sources, missing channels, or incompatible versions.
+
+ 7. Persistent Volume Attach Failures Post Upgrade
+* Cause: CSI driver versions incompatible or PVCs not migrated properly.
+* Solution:
+    * Check CSI controller pods and logs.
+    * Make sure all storage operators are updated.
+    * If CSI migration is needed (e.g., from in-tree to CSI), follow Red Hat migration documentation.
+
+ 8. Custom Network Configurations Failing
+* Cause: Unsupported changes to CNI plugins or MTU sizes not compatible post-upgrade.
+* Solution:
+    * Check oc get network.operator cluster -o yaml for network settings.
+    * Validate MTU, VXLAN/OVN configurations.
+    * Restart affected pods or nodes if needed.
+
+ 9. Authentication and OAuth Failures
+* Cause: Custom identity providers or RBAC changes breaking new OAuth flows.
+* Solution:
+    * Validate IDP settings post-upgrade.
+    * Check oauth logs: oc logs -n openshift-authentication
+    * Recreate secrets/certificates if expired or mismatched.
+
+ 10. Cluster Monitoring Broken
+* Cause: Monitoring stack (Prometheus, Alertmanager, etc.) misconfigured or version mismatched.
+* Solution:
+    * Check status: oc get pod -n openshift-monitoring
+    * Validate ClusterMonitoringConfig is still compatible.
+    * Restart the monitoring stack if required.
+
+
+Helpful Pre-Upgrade Commands
+
+# Dry run of upgrade plan
+oc adm upgrade --dry-run
+
+# Get current and available versions
+oc get clusterversion
+
+# Get status of cluster operators
+oc get co
+
+# Check if any nodes are NotReady
+oc get nodes
+
+# Check for deprecated APIs
+oc get apirequestcounts
+

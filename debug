@@ -1,0 +1,68 @@
+Debugging and analyzing logs in OpenShift is a critical skill for identifying issues with applications, pods, deployments, and cluster operations. 
+
+ 1. Viewing Pod Logs
+To check logs for a specific pod:
+oc logs <pod-name>
+For pods with multiple containers:
+oc logs <pod-name> -c <container-name>
+To follow logs in real-time:
+oc logs -f <pod-name>
+For previous container logs (useful if the pod has crashed):
+oc logs --previous <pod-name>
+
+2. Get Pod Details
+Check events and pod description for hints on failures:
+oc describe pod <pod-name>
+This shows events like image pull errors, OOM kills, readiness probe failures, etc.
+
+
+3. Deployment & Rollout Issues
+
+Check the status of your deployments:
+oc get deploy
+oc describe deploy <deployment-name>
+See rollout status:
+oc rollout status deployment/<deployment-name>
+If something is stuck, check the related replica sets and pods:
+oc get rs
+oc get pods
+
+
+4. Routes and Services
+Check if the app is reachable:
+oc get svc
+oc get routes
+You can also describe them to check endpoints, selectors, etc.:
+oc describe svc <service-name>
+oc describe route <route-name>
+
+
+5. Debugging Tools
+OpenShift 4.x provides a built-in debug command to launch ephemeral containers with tools:
+oc debug pod/<pod-name>
+This will open a shell in a new container with utilities (curl, bash, etc.), helpful for inspecting mounts, environment, networking, etc.
+
+ 6. Node & System Logs
+If you suspect node-level issues:
+oc adm node-logs <node-name>
+For example, to get logs from the kubelet:
+oc adm node-logs <node-name> --path=kubelet
+
+
+7. Application Logs Aggregation
+
+If you’re using OpenShift Logging/ELK stack (formerly EFK):
+* Fluentd → Elasticsearch → Kibana
+* Or the newer Loki/Grafana setup
+You can view logs across the cluster:
+* Navigate to OpenShift Console → Observe → Logs
+* Use filters like project name, pod name, severity, etc.
+
+
+Common Debugging Scenarios
+Symptom	                                    Common Cause
+CrashLoopBackOff	                          App crashes repeatedly → check oc logs and oc describe
+ImagePullBackOff	                          Wrong image name/tag or private registry access issues
+Readiness/Liveness probe failure            Misconfigured probes or app not responding
+Route not accessible	                      Wrong target port, service selector, or no pod running
+OOMKilled	                                  Container exceeds memory limit

@@ -26,7 +26,7 @@ exit
 
 
 
-Restore ETCD (⚠️ Cluster-down scenario):
+Restore ETCD (Cluster-down scenario):
 * Requires bootstrapping control plane with snapshot.
 * Official doc: https://docs.openshift.com/container-platform/latest/backup_and_restore/control_plane_backup_and_restore/backing-up-etcd.html
 

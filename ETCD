@@ -1,0 +1,78 @@
+ETCD backup and restore in OpenShift, along with automating file transfers in and out of pods, you can use a combination of oc CLI, shell scripting, and cron jobs (or pipelines if you use CI/CD).
+
+ ETCD Backup & Restore in OpenShift
+OpenShift (especially 4.x) stores ETCD data across the control plane nodes. For HA clusters, backups are best taken from a single control plane node.
+
+Backup ETCD:
+
+#!/bin/bash
+
+DATE=$(date +%F-%H-%M)
+BACKUP_DIR="/backup/etcd-backup-$DATE"
+mkdir -p $BACKUP_DIR
+
+# Login as kubeadmin or a user with cluster-admin role
+oc debug node/<control-plane-node-name> -- chroot /host
+
+# Inside chroot
+etcdctl snapshot save $BACKUP_DIR/snapshot.db \
+  --cacert=/etc/kubernetes/static-pod-resources/etcd-certs/ca.crt \
+  --cert=/etc/kubernetes/static-pod-resources/etcd-certs/server.crt \
+  --key=/etc/kubernetes/static-pod-resources/etcd-certs/server.key
+
+exit
+
+
+
+
+
+Restore ETCD (⚠️ Cluster-down scenario):
+* Requires bootstrapping control plane with snapshot.
+* Official doc: https://docs.openshift.com/container-platform/latest/backup_and_restore/control_plane_backup_and_restore/backing-up-etcd.html
+
+
+Automate File Transfer In/Out of OpenShift Pods
+
+
+ Copy file into pod:
+#!/bin/bash
+
+POD_NAME=$(oc get pod -l app=myapp -o jsonpath='{.items[0].metadata.name}')
+NAMESPACE=my-namespace
+SRC_FILE=./config.yaml
+DEST_PATH=/app/config/
+
+oc cp $SRC_FILE $NAMESPACE/$POD_NAME:$DEST_PATH
+
+
+Copy file from pod:
+oc cp $NAMESPACE/$POD_NAME:/app/logs/app.log ./app.log
+
+
+Use oc rsync for directories:
+oc rsync ./local-folder/ $NAMESPACE/$POD_NAME:/remote-folder/
+oc rsync $NAMESPACE/$POD_NAME:/remote-folder/ ./local-folder/
+
+Automate with CronJob (optional)
+Create a CronJob in OpenShift to automate periodic backups:
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-backup
+spec:
+  schedule: "0 3 * * *"  # daily at 3 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backup
+              image: registry.access.redhat.com/ubi8/ubi
+              command: ["/bin/bash", "-c"]
+              args:
+                - >
+                  oc debug node/master-0 -- chroot /host \
+                  etcdctl snapshot save /backup/snapshot-$(date +\%F).db --cacert=... --cert=... --key=...
+          restartPolicy: OnFailure
+Ensure appropriate RBAC and token access for automation via ServiceAccount.
+

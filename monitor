@@ -1,0 +1,73 @@
+Monitoring OpenShift clusters is crucial for maintaining the health, performance, and availability of workloads running on them. 
+
+OpenShift, built on Kubernetes, provides built-in monitoring capabilities, and you can also extend them using external tools.
+
+
+Monitoring OpenShift Clusters
+
+1. Built-in Monitoring in OpenShift
+OpenShift comes with an integrated Prometheus-based monitoring stack:
+
+a. Monitoring Components
+* Prometheus: Time-series database and alerting tool.
+* Alertmanager: Handles alerts from Prometheus.
+* Grafana: Visualization (though OpenShift uses its own UI by default).
+* Kube State Metrics: Exposes cluster-level metrics.
+* Node Exporter: Exposes hardware and OS-level metrics.
+
+b. Namespaces
+* openshift-monitoring: Cluster-level monitoring.
+* openshift-user-workload-monitoring: User-defined workloads monitoring.
+
+c. Access
+Cluster administrators can access the monitoring dashboards through the OpenShift Web Console under: Observe > Dashboards / Metrics / Alerts / Targets
+
+2. Enabling User Workload Monitoring
+To monitor your own workloads:
+1. Edit the config map:
+oc edit configmap cluster-monitoring-config -n openshift-monitoring
+2. Add:
+data:
+  config.yaml: |
+    enableUserWorkload: true
+3. Create the openshift-user-workload-monitoring namespace:
+oc create ns openshift-user-workload-monitoring
+4. Deploy your own PrometheusRule, ServiceMonitor, etc.
+
+3. Alerting
+* Use PrometheusRule objects to define alerts.
+* Alertmanager can send alerts via:
+    * Email
+    * Slack
+    * PagerDuty
+    * Webhooks
+
+4. Visualization
+* OpenShift Console provides some dashboards.
+* For deeper visualization, integrate Grafana:
+    * Connect to Prometheus as a data source.
+    * Import dashboards (K8s, node-exporter, etc.).
+
+5. Logs + Metrics Integration
+Combine metrics with logs for full observability:
+* OpenShift Logging stack (EFK/LOKI)
+* Integration with Elastic Stack, Loki + Grafana, or Splunk
+
+6. External Monitoring Tools
+You can also integrate:
+* Datadog
+* Dynatrace
+* New Relic
+* AppDynamics
+* Sysdig
+They often have OpenShift/K8s exporters and provide deep insights.
+
+7. Key Metrics to Monitor
+* Node health: CPU, Memory, Disk usage
+* Pod status: Restarts, Pending, CrashLoop
+* API Server latency
+* Etcd performance
+* Cluster resource usage
+* PVC IOPS / latency
+* App-specific metrics (via Prometheus exporters)
+

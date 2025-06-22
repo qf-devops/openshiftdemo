@@ -6,7 +6,7 @@ Overview
 * Spec Field: message – the custom greeting message.
 * Controller: Prints "Hello from: <message>" to the logs.
 
- 1. Scaffold Project with Kubebuilder
+ 1.  Kubebuilder
 
 kubebuilder init --domain example.com --repo github.com/yourname/helloworld-operator
 kubebuilder create api --group demo --version v1 --kind HelloWorld
